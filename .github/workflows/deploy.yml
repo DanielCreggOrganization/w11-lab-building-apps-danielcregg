@@ -3,19 +3,16 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./device-info-app  # Add working directory
-
+    
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -23,18 +20,20 @@ jobs:
           
       - name: Install dependencies
         run: |
+          cd device-info-app
           npm install -g @ionic/cli
-          npm ci  # Use ci instead of install
+          npm ci
           
       - name: Build
         run: |
+          cd device-info-app
           ionic build --prod --base-href="/w11-lab-building-apps-danielcregg/"
-          cp docs/index.html docs/404.html
-          touch docs/.nojekyll
+          cp www/index.html www/404.html
+          touch www/.nojekyll
 
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./device-info-app/docs
-          enable_jekyll: false
+          folder: device-info-app/www
+          branch: gh-pages
+          clean: true
