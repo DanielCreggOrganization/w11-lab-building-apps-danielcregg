@@ -9,6 +9,10 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./device-info-app  # Add working directory
+
     steps:
       - uses: actions/checkout@v4
       
@@ -20,17 +24,17 @@ jobs:
       - name: Install dependencies
         run: |
           npm install -g @ionic/cli
-          npm install
-
+          npm ci  # Use ci instead of install
+          
       - name: Build
         run: |
           ionic build --prod --base-href="/w11-lab-building-apps-danielcregg/"
           cp docs/index.html docs/404.html
           touch docs/.nojekyll
-          
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
+          publish_dir: ./device-info-app/docs
           enable_jekyll: false
